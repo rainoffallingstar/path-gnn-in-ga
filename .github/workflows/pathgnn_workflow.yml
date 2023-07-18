@@ -1,0 +1,27 @@
+name: Render and Upload Manuscript
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container：
+        image：fallingstar10/gmadeomicsrocker:latest
+
+    steps:
+    - name: Checkout code
+      run: git clone https://${{secrets.GITLINK_USER}}:${{secrets.GITLINK_PASS}}@gitlink.com/${{secrets.GITLINK_REPO}}
+    
+
+    - name: Render QML files
+      run: |
+       cd ${{secrets.GITLINK_REPO}}
+       Rscript -e "library(knitr); knit('result.qmd')"
+    
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: manuscript
+        path: ${{secrets.GITLINK_REPO}}/manuscript/
